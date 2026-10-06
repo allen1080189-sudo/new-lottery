@@ -1,7 +1,7 @@
 # new-lottery
 the free lottery game
 
-<!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
