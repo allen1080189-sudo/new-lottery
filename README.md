@@ -6,7 +6,7 @@ the free lottery game
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>幸運大樂透對獎模擬器 (版面穩定版)</title>
+    <title>幸運大樂透對獎模擬器 (版面鎖死穩定版)</title>
     <style>
         :root {
             --primary-color: #e74c3c;
@@ -218,25 +218,25 @@ the free lottery game
         .btn-primary:hover:not(:disabled) { background-color: #c0392b; }
         .btn-primary:disabled { background-color: #bdc3c7; cursor: not-allowed; }
         
-        /* === 修正後的開獎區與動畫樣式 === */
+        /* === 完全鎖定版面的開獎區與文字區 === */
         #draw-area {
             display: flex;
             justify-content: center;
-            align-items: center; /* 確保垂直置中 */
+            align-items: center; 
             gap: 10px;
-            min-height: 70px; /* 預留固定高度，防止版面跳動 */
+            height: 70px; /* 鎖死高度，避免球出現時撐大版面 */
             margin-top: 15px;
-            flex-wrap: wrap; /* 螢幕太小允許換行 */
+            flex-wrap: wrap; 
         }
         .drawn-ball {
-            width: 50px;  /* 從 60px 縮小 */
-            height: 50px; /* 從 60px 縮小 */
-            flex-shrink: 0; /* 防止被 flex 壓縮變形 */
+            width: 50px;  
+            height: 50px; 
+            flex-shrink: 0; 
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.3rem; /* 稍微調小字體 */
+            font-size: 1.3rem; 
             font-weight: bold;
             color: white;
             opacity: 0;
@@ -251,7 +251,6 @@ the free lottery game
         .normal-ball { background-color: #e67e22; }
         .special-ball { background-color: var(--special-color); }
         
-        /* 獨立出來的加號樣式 */
         .plus-sign {
             font-size: 1.5rem;
             color: var(--text-color);
@@ -268,21 +267,22 @@ the free lottery game
             text-align: center;
             font-size: 1.5rem;
             font-weight: bold;
-            margin-top: 20px;
+            margin-top: 15px;
             color: var(--primary-color);
-            min-height: 90px; /* 預留高度給對獎文字，避免往下擠 */
+            height: 120px; /* 鎖死文字區高度，直接預留給 3 行字的空間 */
             display: flex;
             flex-direction: column;
             justify-content: center;
+            box-sizing: border-box;
         }
         .prize-money {
             color: #27ae60;
             font-size: 1.8rem;
             display: block;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
-        /* 響應式設計 */
+        /* 響應式設計：針對小螢幕重新分配絕對高度 */
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
             .prize-board { flex: none; width: 100%; position: static; }
@@ -292,9 +292,12 @@ the free lottery game
         @media (max-width: 600px) {
             .grid { grid-template-columns: repeat(5, 1fr); }
             .ball { min-height: 50px; }
-            /* 手機版進一步縮小球，避免換行撐大版面 */
             .drawn-ball { width: 40px; height: 40px; font-size: 1.1rem; }
-            #draw-area { gap: 5px; min-height: 55px; }
+            
+            /* 手機版容易換行，直接鎖定兩行所需的高度 */
+            #draw-area { gap: 5px; height: 100px; }
+            #result { height: 130px; font-size: 1.3rem; }
+            
             .plus-sign { font-size: 1.2rem; margin: 0 2px; }
             .stat-item { flex: 1 1 100%; }
         }
@@ -452,7 +455,7 @@ the free lottery game
                     ball.style.borderColor = '';
                 });
                 drawArea.innerHTML = '<div style="color: #999;">請先完成選號並點擊開始開獎</div>';
-                resultText.textContent = '';
+                resultText.innerHTML = '';
                 updateStatus();
             });
 
@@ -476,7 +479,9 @@ the free lottery game
                 btnDraw.disabled = true;
                 document.getElementById('btn-random').disabled = true;
                 document.getElementById('btn-clear').disabled = true;
-                resultText.textContent = '開獎中...';
+                
+                // 開獎時保留結果區的高度，僅清除內容
+                resultText.innerHTML = '<span style="color: #7f8c8d; font-size: 1.2rem;">開獎中...</span>';
                 drawArea.innerHTML = '';
 
                 document.querySelectorAll('.ball.selected').forEach(ball => {
@@ -494,7 +499,6 @@ the free lottery game
                             ballDiv.classList.add('normal-ball');
                         } else {
                             ballDiv.classList.add('special-ball');
-                            // 改用新的 class 處理加號
                             const label = document.createElement('div');
                             label.classList.add('plus-sign');
                             label.textContent = '+';
@@ -568,9 +572,10 @@ the free lottery game
                     prizeMoney = 0;
                 }
 
+                // 為了避免因沒有獎金時少一行而導致的微微跳動，我們加入 `<br>` 控制
                 let finalHTML = `${prizeText}<br><span style="color: #e74c3c;">${resultMsg}</span>`;
                 if (prizeMoney > 0) {
-                    finalHTML += `<span class="prize-money">獲得獎金：NT$ ${prizeMoney.toLocaleString()}</span>`;
+                    finalHTML += `<br><span class="prize-money">獲得獎金：NT$ ${prizeMoney.toLocaleString()}</span>`;
                 }
                 
                 resultText.innerHTML = finalHTML;
